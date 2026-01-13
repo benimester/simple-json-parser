@@ -1,12 +1,8 @@
 package edu.bbte.simple_json_parser.types;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 
 // Composite
-@Getter
 public class JsonObject implements JsonNode {
     private final ArrayList<JsonNode> children;
 
@@ -28,6 +24,8 @@ public class JsonObject implements JsonNode {
 
         private Builder newChild;
 
+        private JsonArray.Builder newArrayChild;
+
         public Builder() {
         }
 
@@ -41,15 +39,25 @@ public class JsonObject implements JsonNode {
         }
 
         public Builder startObject(String key) {
-            newChild = JsonObject.newBuilder().startObject();
-            newChild.setKey(key);
+            if (newArrayChild != null) {
+                newChild = JsonObject.newBuilder().startObject();
+                newChild.setKey(null);
+            } else {
+                newChild = JsonObject.newBuilder().startObject();
+                newChild.setKey(key);
+            }
             return this;
         }
 
         public Builder endObject() {
             if (children != null && newChild != null) {
-                children.add(newChild.build());
-                newChild = null;
+                if (newArrayChild != null) {
+                    newArrayChild.addObject(newChild.build());
+                    newChild = null;
+                } else {
+                    children.add(newChild.build());
+                    newChild = null;
+                }
                 return this;
             }
 
@@ -58,6 +66,32 @@ public class JsonObject implements JsonNode {
             }
 
             return this;
+        }
+
+        public Builder startArray(String key) {
+            newArrayChild = JsonArray.newBuilder().setKey(key);
+            return this;
+        }
+
+        public Builder endArray() {
+            if (children != null && newArrayChild != null) {
+                children.add(newArrayChild.build());
+                newArrayChild = null;
+            }
+            return this;
+        }
+
+        public Builder addArray(JsonArray arr) {
+            if (newChild != null) {
+                newChild.addArray(arr);
+            } else {
+                children.add(arr);
+            }
+            return this;
+        }
+
+        public JsonArray.Builder getArrayBuilder() {
+            return newArrayChild;
         }
 
         public Builder addProperty(String key, String value) {
@@ -109,12 +143,12 @@ public class JsonObject implements JsonNode {
             return this;
         }
 
-        public String getKey() {
-            return key;
-        }
-
         public void setKey(String key) {
             this.key = key;
         }
+    }
+
+    public String getKey() {
+        return key;
     }
 }
