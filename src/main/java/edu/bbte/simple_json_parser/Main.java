@@ -1,13 +1,20 @@
 package edu.bbte.simple_json_parser;
 
 import edu.bbte.simple_json_parser.types.JsonObject;
+import edu.bbte.simple_json_parser.visitor.JsonFormatterVisitor;
 
 import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        JsonParser jsonParser = new JsonParser(new File("/Users/benimester/Documents/University/Master/I/Mintak/Projekt/simple-json-parser/src/main/resources/test.json"));
+        // Example: Parse from file
+        String resourcePath = Main.class.getClassLoader().getResource("test.json").getPath();
+        JsonParser jsonParser = new JsonParser(new File(resourcePath));
         JsonObject finalObject = jsonParser.startReading();
-        System.out.println("JSON parsed successfully.");
+
+        // Use the Visitor pattern to format the output
+        JsonFormatterVisitor visitor = new JsonFormatterVisitor();
+        finalObject.accept(visitor);
+        System.out.println(visitor.getResult());
     }
 }

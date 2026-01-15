@@ -1,6 +1,9 @@
 package edu.bbte.simple_json_parser.types;
 
+import edu.bbte.simple_json_parser.visitor.JsonVisitor;
+
 import java.util.ArrayList;
+import java.util.List;
 
 // Composite
 public class JsonObject implements JsonNode {
@@ -11,6 +14,19 @@ public class JsonObject implements JsonNode {
     public JsonObject(Builder builder) {
         this.children = builder.children;
         this.key = builder.key;
+    }
+
+    @Override
+    public void accept(JsonVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public List<JsonNode> getChildren() {
+        return children;
     }
 
     public static Builder newBuilder() {
@@ -128,7 +144,7 @@ public class JsonObject implements JsonNode {
             if (newChild != null) {
                 newChild.addNullProperty(key);
             } else {
-                children.add(new JsonNull());
+                children.add(new JsonNull(key));
             }
 
             return this;
@@ -143,12 +159,9 @@ public class JsonObject implements JsonNode {
             return this;
         }
 
-        public void setKey(String key) {
+        public Builder setKey(String key) {
             this.key = key;
+            return this;
         }
-    }
-
-    public String getKey() {
-        return key;
     }
 }

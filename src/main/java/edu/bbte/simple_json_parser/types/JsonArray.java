@@ -1,8 +1,14 @@
 package edu.bbte.simple_json_parser.types;
 
-import java.util.ArrayList;
+import edu.bbte.simple_json_parser.visitor.JsonVisitor;
 
-// Composite
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Composite pattern - represents a JSON array that can contain child nodes.
+ * Uses the Builder pattern for construction.
+ */
 public class JsonArray implements JsonNode {
     private final ArrayList<JsonNode> elements;
     private final String key;
@@ -10,6 +16,19 @@ public class JsonArray implements JsonNode {
     public JsonArray(Builder builder) {
         this.elements = builder.elements;
         this.key = builder.key;
+    }
+
+    @Override
+    public void accept(JsonVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public List<JsonNode> getElements() {
+        return elements;
     }
 
     public static Builder newBuilder() {
