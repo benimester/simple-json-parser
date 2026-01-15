@@ -5,7 +5,8 @@ import edu.bbte.simple_json_parser.types.*;
 import java.util.List;
 
 /**
- * Concrete Visitor implementation that formats JSON nodes into a pretty-printed string.
+ * Concrete Visitor implementation that formats JSON nodes into a pretty-printed
+ * string.
  */
 public class JsonFormatterVisitor implements JsonVisitor {
     private final StringBuilder sb = new StringBuilder();
@@ -115,7 +116,7 @@ public class JsonFormatterVisitor implements JsonVisitor {
     @Override
     public void visit(JsonBoolean jsonBoolean) {
         String key = jsonBoolean.getKey();
-        boolean value = jsonBoolean.getValue();
+        boolean value = jsonBoolean.isValue();
 
         if (key != null) {
             appendIndent();
@@ -148,17 +149,31 @@ public class JsonFormatterVisitor implements JsonVisitor {
         StringBuilder result = new StringBuilder();
         for (char c : s.toCharArray()) {
             switch (c) {
-                case '"': result.append("\\\""); break;
-                case '\\': result.append("\\\\"); break;
-                case '\b': result.append("\\b"); break;
-                case '\f': result.append("\\f"); break;
-                case '\n': result.append("\\n"); break;
-                case '\r': result.append("\\r"); break;
-                case '\t': result.append("\\t"); break;
-                default: result.append(c);
+                case '"':
+                    result.append("\\\"");
+                    break;
+                case '\\':
+                    result.append("\\\\");
+                    break;
+                case '\b':
+                    result.append("\\b");
+                    break;
+                case '\f':
+                    result.append("\\f");
+                    break;
+                case '\n':
+                    result.append("\\n");
+                    break;
+                case '\r':
+                    result.append("\\r");
+                    break;
+                case '\t':
+                    result.append("\\t");
+                    break;
+                default:
+                    result.append(c);
             }
         }
         return result.toString();
     }
 }
-

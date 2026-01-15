@@ -8,8 +8,10 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
 }
 
 application {
-    mainClass = 'edu.bbte.simple_json_parser.Main'
+    mainClass = 'edu.bbte.simple_json_parser.view.JsonFormatterApp'
 }

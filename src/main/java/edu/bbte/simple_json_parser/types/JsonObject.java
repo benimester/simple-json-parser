@@ -1,11 +1,12 @@
 package edu.bbte.simple_json_parser.types;
 
 import edu.bbte.simple_json_parser.visitor.JsonVisitor;
+import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 // Composite
+@Getter
 public class JsonObject implements JsonNode {
     private final ArrayList<JsonNode> children;
 
@@ -19,14 +20,6 @@ public class JsonObject implements JsonNode {
     @Override
     public void accept(JsonVisitor visitor) {
         visitor.visit(this);
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public List<JsonNode> getChildren() {
-        return children;
     }
 
     public static Builder newBuilder() {
