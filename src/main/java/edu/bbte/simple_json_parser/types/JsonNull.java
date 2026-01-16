@@ -4,7 +4,6 @@ import edu.bbte.simple_json_parser.visitor.JsonVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-// Leaf node in the Composite pattern (also represents null value - Special Case pattern)
 @Getter
 @AllArgsConstructor
 public class JsonNull implements JsonNode {

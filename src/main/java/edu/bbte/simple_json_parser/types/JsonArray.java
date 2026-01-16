@@ -5,14 +5,6 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 
-/**
- * Composite pattern - represents a JSON array that can contain child nodes.
- * Uses the Builder pattern for construction.
- */
-/**
- * Composite pattern - represents a JSON array that can contain child nodes.
- * Uses the Builder pattern for construction.
- */
 @Getter
 public class JsonArray implements JsonNode {
     private final ArrayList<JsonNode> elements;

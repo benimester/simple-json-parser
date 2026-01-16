@@ -25,10 +25,8 @@ public class JsonFormatterApp extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Create the split panel for input and output
         JPanel textAreasPanel = new JPanel(new GridLayout(1, 2, 10, 0));
 
-        // Input panel (left)
         JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
         JLabel inputLabel = new JLabel("Input JSON:");
         inputTextArea = new JTextArea();
@@ -39,7 +37,6 @@ public class JsonFormatterApp extends JFrame {
         inputPanel.add(inputLabel, BorderLayout.NORTH);
         inputPanel.add(inputScrollPane, BorderLayout.CENTER);
 
-        // Output panel (right)
         JPanel outputPanel = new JPanel(new BorderLayout(5, 5));
         JLabel outputLabel = new JLabel("Formatted Output:");
         outputTextArea = new JTextArea();
@@ -54,17 +51,14 @@ public class JsonFormatterApp extends JFrame {
         textAreasPanel.add(inputPanel);
         textAreasPanel.add(outputPanel);
 
-        // Bottom panel with button and status
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 10));
 
-        // Format button (centered)
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton formatButton = new JButton("Format");
         formatButton.setPreferredSize(new Dimension(100, 30));
         formatButton.addActionListener(e -> formatJson());
         buttonPanel.add(formatButton);
 
-        // Status label
         statusLabel = new JLabel(" ");
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         statusLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
@@ -98,13 +92,12 @@ public class JsonFormatterApp extends JFrame {
 
             outputTextArea.setText(formattedOutput);
 
-            // Check if output contains error markers
             if (formattedOutput.contains("/* Error:")) {
                 statusLabel.setText("JSON parsed with errors");
                 statusLabel.setForeground(Color.RED);
             } else {
                 statusLabel.setText("JSON parsed successfully");
-                statusLabel.setForeground(new Color(0, 128, 0)); // Dark green
+                statusLabel.setForeground(new Color(0, 128, 0));
             }
         } catch (Exception ex) {
             statusLabel.setText("Error: " + ex.getMessage());
@@ -120,4 +113,3 @@ public class JsonFormatterApp extends JFrame {
         });
     }
 }
-

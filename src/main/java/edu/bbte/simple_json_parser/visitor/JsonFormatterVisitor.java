@@ -4,10 +4,6 @@ import edu.bbte.simple_json_parser.types.*;
 
 import java.util.List;
 
-/**
- * Concrete Visitor implementation that formats JSON nodes into a pretty-printed
- * string.
- */
 public class JsonFormatterVisitor implements JsonVisitor {
     private final StringBuilder sb = new StringBuilder();
     private int indentLevel = 0;

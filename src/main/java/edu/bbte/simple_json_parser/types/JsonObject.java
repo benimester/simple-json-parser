@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 
-// Composite
 @Getter
 public class JsonObject implements JsonNode {
     private final ArrayList<JsonNode> children;

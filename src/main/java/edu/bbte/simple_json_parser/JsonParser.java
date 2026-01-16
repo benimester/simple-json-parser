@@ -29,7 +29,6 @@ public class JsonParser {
         } else if (file != null) {
             try {
                 scanner = new Scanner(file);
-                // Use empty delimiter to read character by character when needed
                 scanner.useDelimiter("");
             } catch (FileNotFoundException e) {
                 System.out.println("File not found");
@@ -50,15 +49,11 @@ public class JsonParser {
         }
     }
 
-    /**
-     * Reads a complete string value starting with a quote.
-     * Returns the string including quotes, or null if unterminated.
-     */
     private String readStringValue() {
         if (!scanner.hasNext("\"")) {
             return null;
         }
-        scanner.next(); // consume opening quote
+        scanner.next();
         StringBuilder sb = new StringBuilder("\"");
 
         while (scanner.hasNext()) {
@@ -66,20 +61,16 @@ public class JsonParser {
             sb.append(ch);
 
             if (ch.equals("\"")) {
-                // Found closing quote
                 return sb.toString();
             }
             if (ch.equals("\\") && scanner.hasNext()) {
-                // Escape sequence - consume next character
                 sb.append(scanner.next());
             }
-            // Check for newline which would indicate unterminated string
             if (ch.equals("\n") || ch.equals("\r")) {
-                return null; // Unterminated string (newline before closing quote)
+                return null;
             }
         }
 
-        // Reached end of input without closing quote
         return null;
     }
 
@@ -90,13 +81,12 @@ public class JsonParser {
             skipWhitespace();
 
             if (scanner.hasNext("\\{")) {
-                scanner.next(); // consume '{'
+                scanner.next();
                 builder.startObject();
             }
 
             skipWhitespace();
 
-            // Check for unterminated string in key
             if (scanner.hasNext("\"")) {
                 String key = readStringValue();
                 if (key == null) {
@@ -107,23 +97,18 @@ public class JsonParser {
 
                 skipWhitespace();
 
-                // Check for missing colon after key
                 if (!scanner.hasNext(":")) {
                     builder.addError("Missing colon after key: " + key);
                     return;
                 }
-                scanner.next(); // consume ':'
+                scanner.next();
                 skipWhitespace();
 
-                // Check for missing value (comma or closing brace immediately after colon)
                 if (scanner.hasNext("[,}]")) {
                     builder.addError("Missing value for key: " + key);
                     return;
                 }
-
-                // Parse value based on the next character
                 if (scanner.hasNext("\"")) {
-                    // String value - use readStringValue for proper detection
                     String strValue = readStringValue();
                     if (strValue == null) {
                         builder.addError("Unterminated string for key: " + key);
@@ -131,11 +116,11 @@ public class JsonParser {
                     }
                     builder.addProperty(key, strValue.substring(1, strValue.length() - 1));
                 } else if (scanner.hasNext("\\{")) {
-                    scanner.next(); // consume '{'
+                    scanner.next();
                     builder.startObject(key);
                     parse(builder);
                 } else if (scanner.hasNext("\\[")) {
-                    scanner.next(); // consume '['
+                    scanner.next();
                     builder.startArray(key);
                     parseArray(builder.getArrayBuilder());
                     builder.endArray();
@@ -177,36 +162,31 @@ public class JsonParser {
                 }
 
                 skipWhitespace();
-                // Check for comma or closing brace
                 if (scanner.hasNext(",")) {
-                    scanner.next(); // consume ','
+                    scanner.next();
                 } else if (scanner.hasNext("}")) {
-                    scanner.next(); // consume '}'
+                    scanner.next();
                     builder.endObject();
                     foundClosingBrace = true;
                     return;
                 } else if (scanner.hasNext()) {
-                    // There's more input but not a comma or closing brace
                     builder.addError("Expected ',' or '}' in object");
                     return;
                 } else {
-                    // Reached end of input without comma or closing brace
                     builder.addError("Unclosed object: missing '}'");
                     return;
                 }
             } else if (scanner.hasNext("}")) {
-                scanner.next(); // consume '}'
+                scanner.next();
                 builder.endObject();
                 foundClosingBrace = true;
                 return;
             } else {
-                // No valid key found and not a closing brace
                 builder.addError("Expected key or closing '}'");
                 return;
             }
         }
 
-        // Reached end of input without finding closing brace
         if (!foundClosingBrace) {
             builder.addError("Unclosed object: missing '}'");
         }
@@ -218,16 +198,13 @@ public class JsonParser {
         while (scanner.hasNext()) {
             skipWhitespace();
 
-            // Check for empty array or end of array
             if (scanner.hasNext("\\]")) {
-                scanner.next(); // consume ']'
+                scanner.next();
                 foundClosingBracket = true;
                 return;
             }
 
-            // Parse value based on the next character
             if (scanner.hasNext("\"")) {
-                // String value - use readStringValue for proper detection
                 String strValue = readStringValue();
                 if (strValue == null) {
                     arrayBuilder.addError("Unterminated string in array");
@@ -235,14 +212,12 @@ public class JsonParser {
                 }
                 arrayBuilder.addElement(strValue.substring(1, strValue.length() - 1));
             } else if (scanner.hasNext("\\{")) {
-                scanner.next(); // consume '{'
-                // Nested object inside array
+                scanner.next();
                 JsonObject.Builder nestedObjectBuilder = JsonObject.newBuilder().startObject();
                 parseNestedObject(nestedObjectBuilder);
                 arrayBuilder.addObject(nestedObjectBuilder.build());
             } else if (scanner.hasNext("\\[")) {
-                scanner.next(); // consume '['
-                // Nested array inside array
+                scanner.next();
                 JsonArray.Builder nestedArrayBuilder = JsonArray.newBuilder();
                 parseArray(nestedArrayBuilder);
                 arrayBuilder.addArray(nestedArrayBuilder.build());
@@ -284,25 +259,20 @@ public class JsonParser {
             }
 
             skipWhitespace();
-            // Check for comma or end of array - use limited horizon
             if (scanner.hasNext(",")) {
-                scanner.next(); // consume ','
+                scanner.next();
             } else if (scanner.hasNext("\\]")) {
-                scanner.next(); // consume ']'
+                scanner.next();
                 foundClosingBracket = true;
                 return;
             } else if (scanner.hasNext()) {
-                // There's more input but not a comma or closing bracket
                 arrayBuilder.addError("Expected ',' or ']' in array");
                 return;
             } else {
-                // Reached end of input without comma or closing bracket
                 arrayBuilder.addError("Unclosed array: missing ']'");
                 return;
             }
         }
-
-        // Reached end of input without finding closing bracket
         if (!foundClosingBracket) {
             arrayBuilder.addError("Unclosed array: missing ']'");
         }
@@ -314,14 +284,12 @@ public class JsonParser {
         while (scanner.hasNext()) {
             skipWhitespace();
 
-            // Check for closing brace (empty object or end of object)
             if (scanner.hasNext("}")) {
-                scanner.next(); // consume '}'
+                scanner.next();
                 foundClosingBrace = true;
                 return;
             }
 
-            // Check for unterminated string in key
             if (scanner.hasNext("\"")) {
                 String key = readStringValue();
                 if (key == null) {
@@ -332,23 +300,19 @@ public class JsonParser {
 
                 skipWhitespace();
 
-                // Check for missing colon after key
                 if (!scanner.hasNext(":")) {
                     builder.addError("Missing colon after key: " + key);
                     return;
                 }
-                scanner.next(); // consume ':'
+                scanner.next();
                 skipWhitespace();
 
-                // Check for missing value (comma or closing brace immediately after colon)
                 if (scanner.hasNext("[,}]")) {
                     builder.addError("Missing value for key: " + key);
                     return;
                 }
 
-                // Parse value based on the next character
                 if (scanner.hasNext("\"")) {
-                    // String value - use readStringValue for proper detection
                     String strValue = readStringValue();
                     if (strValue == null) {
                         builder.addError("Unterminated string for key: " + key);
@@ -356,12 +320,12 @@ public class JsonParser {
                     }
                     builder.addProperty(key, strValue.substring(1, strValue.length() - 1));
                 } else if (scanner.hasNext("\\{")) {
-                    scanner.next(); // consume '{'
+                    scanner.next();
                     builder.startObject(key);
                     parseNestedObject(builder);
                     builder.endObject();
                 } else if (scanner.hasNext("\\[")) {
-                    scanner.next(); // consume '['
+                    scanner.next();
                     JsonArray.Builder nestedArrayBuilder = JsonArray.newBuilder().setKey(key);
                     parseArray(nestedArrayBuilder);
                     builder.addArray(nestedArrayBuilder.build());
@@ -403,30 +367,25 @@ public class JsonParser {
                 }
 
                 skipWhitespace();
-                // Check for comma or closing brace
                 if (scanner.hasNext(",")) {
-                    scanner.next(); // consume ','
+                    scanner.next();
                 } else if (scanner.hasNext("}")) {
-                    scanner.next(); // consume '}'
+                    scanner.next();
                     foundClosingBrace = true;
                     return;
                 } else if (scanner.hasNext()) {
-                    // There's more input but not a comma or closing brace
                     builder.addError("Expected ',' or '}' in object");
                     return;
                 } else {
-                    // Reached end of input without comma or closing brace
                     builder.addError("Unclosed object: missing '}'");
                     return;
                 }
             } else {
-                // No valid key found and not a closing brace
                 builder.addError("Expected key or closing '}'");
                 return;
             }
         }
 
-        // Reached end of input without finding closing brace
         if (!foundClosingBrace) {
             builder.addError("Unclosed object: missing '}'");
         }
